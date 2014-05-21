@@ -1,0 +1,17 @@
+{
+  "name": "wiki",
+  "version": "0.0.0",
+  "description": "",
+  "main": ".#redis.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "hapi": "^5.0.0",
+    "redis": "^0.10.2",
+    "restify": "^2.8.1",
+    "showdown": "^0.3.1"
+  }
+}
