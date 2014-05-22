@@ -7,14 +7,24 @@ var server = restify.createServer(
       if (body instanceof Error)
         return body.stack;
 
-      if (Buffer.isBuffer(body))
-        return body.toString('base64');
+      if (Buffer.isBuffer(body)){
+	  res.writeHead(200, {
+	      'Content-Length': Buffer.byteLength(body),
+	      'Content-Type': 'text/html'
+	  });
+          return body.toString();
+      }
 
-      return util.inspect(body);
-    }}
+      return body;
+    },
+      'text/html': function(req, res, body){
+	  return body;
+      }
+  }
 });
 
 server.use(restify.bodyParser({ mapParams: false })); 
+server.use(restify.queryParser());
 
 var redis = require('redis'),
     client = redis.createClient();
@@ -29,11 +39,21 @@ client.on("error", function (err) {
 });
 
 
+var pre = "<html><body>";
+var post = "</body></html>"
 
 server.get('/:wiki', function(req, res, next){
     var page = req.params.wiki;
+    var raw = "raw" === req.query.format;
+    console.log(req.query);
     client.get(page, function(err, val){
-	res.send(converter.makeHtml(val));
+	if(raw){
+	    res.header('Content-Type','text/plain');
+	    res.send(val);
+	}else{
+	    res.header('Content-Type','text/html');
+	    res.send(pre+converter.makeHtml(val)+post);
+	}
 	next();
     });
 });
